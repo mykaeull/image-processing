@@ -6,12 +6,20 @@ import { GrGallery } from "react-icons/gr";
 import useImageUploaderContext from "@/app/contexts/ImageUploaderContext";
 
 const ImageUploader = () => {
-    const { fileInputRef, canvasRef, imageSrc, setImageSrc, setHistory } =
-        useImageUploaderContext();
+    const {
+        fileInputRef,
+        canvasRef,
+        imageSrc,
+        setImageSrc,
+        setHistory,
+        setFileName,
+        fileName,
+    } = useImageUploaderContext();
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        if (file && (file.type === "image/png" || file.type === "image/jpeg")) {
+        if (file && file.type === "image/jpeg") {
+            setFileName(file.name);
             const reader = new FileReader();
             reader.onload = (e) => {
                 setImageSrc(e.target.result);
@@ -25,9 +33,7 @@ const ImageUploader = () => {
                     canvas.height = image.height;
                     ctx.drawImage(image, 0, 0);
 
-                    setHistory([
-                        ctx.getImageData(0, 0, canvas.width, canvas.height),
-                    ]);
+                    setHistory([file.name]);
 
                     const imageData = ctx.getImageData(
                         0,
@@ -37,7 +43,7 @@ const ImageUploader = () => {
                     );
                     const pixels = imageData.data;
 
-                    console.log(pixels);
+                    // console.log(pixels);
                 };
             };
             reader.readAsDataURL(file);
@@ -63,7 +69,7 @@ const ImageUploader = () => {
             >
                 <input
                     type="file"
-                    accept="image/jpeg, image/png"
+                    accept="image/jpeg"
                     onChange={handleFileChange}
                     ref={fileInputRef}
                     style={{ display: "none" }}

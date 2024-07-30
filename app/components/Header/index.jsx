@@ -6,22 +6,42 @@ import "./index.scss";
 import useImageUploaderContext from "@/app/contexts/ImageUploaderContext";
 import { laplacianFilter } from "@/app/utils/filters/laplacian";
 
-const filtersOptions = [
-    {
-        name: "laplacian",
-        filterFn: laplacianFilter,
-    },
-];
+function generateHash(length = 8) {
+    const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let hash = "";
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        hash += characters[randomIndex];
+    }
+    return hash + ".jpg";
+}
 
 const Header = () => {
-    const { imageSrc, undoChange } = useImageUploaderContext();
+    const { imageSrc, undoChange, fileName } = useImageUploaderContext();
+
+    const transformationsOptions = [
+        {
+            name: "Gamma",
+            transformationStr: `python final.py 5 ${fileName} param1 param2 ${generateHash()}`,
+            fields: [0.2, 10.0],
+        },
+        {
+            name: "Sepia",
+            transformationStr: `python final.py 0 ${fileName} ${generateHash()}`,
+            fields: [],
+        },
+    ];
 
     const disabled = imageSrc === null ? true : false;
 
     return (
         <header className="header">
             <div className="right-content">
-                <FunctionsSelect text="Filters" options={filtersOptions} />
+                <FunctionsSelect
+                    text="Filters"
+                    options={transformationsOptions}
+                />
             </div>
             <button
                 disabled={disabled}
