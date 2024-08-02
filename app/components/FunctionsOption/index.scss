@@ -1,3 +1,15 @@
 .filter-option-button {
     cursor: pointer;
+    width: 100%;
+}
+
+.filter-section {
+    display: flex;
+    flex-direction: row;
+
+    .filter-input {
+        width: 4rem;
+        padding: 5px;
+        font-size: 1rem;
+    }
 }

@@ -100,7 +100,7 @@ const FunctionsSelect = ({ options }) => {
 
     const handleFilterClick = (transformationStr, fields) => {
         applyFilter(transformationStr, fields);
-        setShowFilters(false);
+        // setShowFilters(false);
     };
 
     return (

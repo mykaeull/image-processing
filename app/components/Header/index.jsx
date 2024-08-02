@@ -22,14 +22,19 @@ const Header = () => {
 
     const transformationsOptions = [
         {
-            name: "Gamma",
-            transformationStr: `python final.py 5 ${fileName} param1 param2 ${generateHash()}`,
-            fields: [0.2, 10.0],
+            name: "Sepia",
+            transformationStr: `python filters.py 0 ${fileName} ${generateHash()}`,
+            fields: [],
         },
         {
-            name: "Sepia",
-            transformationStr: `python final.py 0 ${fileName} ${generateHash()}`,
+            name: "Escala de cinza",
+            transformationStr: `python filters.py 1 ${fileName} ${generateHash()}`,
             fields: [],
+        },
+        {
+            name: "Gamma",
+            transformationStr: `python filters.py 5 ${fileName} param1 param2 ${generateHash()}`,
+            fields: [0.2, 10.0],
         },
     ];
 
@@ -37,12 +42,7 @@ const Header = () => {
 
     return (
         <header className="header">
-            <div className="right-content">
-                <FunctionsSelect
-                    text="Filters"
-                    options={transformationsOptions}
-                />
-            </div>
+            <FunctionsSelect text="Filters" options={transformationsOptions} />
             <button
                 disabled={disabled}
                 style={{ cursor: disabled ? "not-allowed" : "pointer" }}
