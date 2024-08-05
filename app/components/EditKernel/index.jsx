@@ -128,6 +128,8 @@ const EditKernel = ({
                                 alert('Apenas números impares são permitidos');
                             } else if(event.target.value > 9) {
                                 alert('O tamanho máximo do Kernel deve ser 9');
+                            } else if(event.target.value < 3) {
+                                alert('O tamanho mínimo do Kernel deve ser 3');
                             } else {
                                 setKernelSize(event.target.value);
                                 setStates(getDefaultValues(event.target.value));
