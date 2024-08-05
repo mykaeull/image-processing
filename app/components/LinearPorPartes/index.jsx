@@ -129,7 +129,7 @@ const LinearPorPartes = ({ setShowModal, showModal, ...props }) => {
             style={{ minWidth: "400px", minHeight: "400px" }}
         >
             <Modal.Header>
-                <p> Linear Por partes </p>
+                <p> Linear por partes </p>
             </Modal.Header>
             <Modal.Content>
                 <canvas
