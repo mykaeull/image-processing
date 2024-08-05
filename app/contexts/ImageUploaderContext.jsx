@@ -39,6 +39,8 @@ export function ImageUploaderProvider({ children }) {
             const currentFileNamePath = `http://localhost:4000/${currentFileName}`;
 
             loadImage(currentFileNamePath).then((data) => {
+                canvas.width  = data.width;
+                canvas.height = data.height;
                 ctx.drawImage(data, 0, 0);
                 const imageData = ctx.getImageData(
                     0,

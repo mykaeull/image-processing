@@ -1,10 +1,10 @@
 "use client";
 
 import useImageUploaderContext from "@/app/contexts/ImageUploaderContext";
-import { laplacianFilter } from "@/app/utils/filters/laplacian";
 import React, { useState } from "react";
 import "./index.scss";
 import FunctionsOption from "../FunctionsOption";
+import send from "../../utils/send";
 
 const FunctionsSelect = ({ options }) => {
     const [showFilters, setShowFilters] = useState(false);
@@ -13,26 +13,6 @@ const FunctionsSelect = ({ options }) => {
         useImageUploaderContext();
 
     const disabled = imageSrc === null ? true : false;
-
-    async function send(message, canloadImage = true, data = undefined) {
-        const obj = {
-            message,
-            data,
-        };
-
-        const options = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            mode: "cors",
-            body: JSON.stringify(obj),
-        };
-
-        fetch("http://localhost:4000/", options)
-            .then((response) => response.json())
-            .then((response) => {});
-    }
 
     const loadImage = (src) => {
         return new Promise((resolve, reject) => {
@@ -47,17 +27,8 @@ const FunctionsSelect = ({ options }) => {
     const applyFilter = (transformationStr, fields) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
-        // const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        // const pixels = imageData.data;
-        // const filteredPixels = filterFunction(
-        //     pixels,
-        //     canvas.width,
-        //     canvas.height
-        // );
 
-        // for (let i = 0; i < pixels.length; i++) {
-        //     imageData.data[i] = filteredPixels[i];
-        // }
+        const codes_with_no_effect = ['20'];
 
         let transformationStrFormatted = transformationStr;
 
@@ -70,6 +41,8 @@ const FunctionsSelect = ({ options }) => {
 
         send(transformationStrFormatted);
 
+        if(codes_with_no_effect.includes(transformationStrFormatted.split(' ')[2])) return;
+
         const currentFileName = transformationStrFormatted
             .split(" ")
             .slice(-1)[0];
@@ -81,6 +54,8 @@ const FunctionsSelect = ({ options }) => {
         const tryLoadImage = async () => {
             try {
                 const data = await loadImage(currentFileNamePath);
+                canvas.width  = data.width;
+                canvas.height = data.height;
                 ctx.drawImage(data, 0, 0);
                 const imageData = ctx.getImageData(
                     0,
@@ -91,7 +66,9 @@ const FunctionsSelect = ({ options }) => {
                 ctx.putImageData(imageData, 0, 0);
                 setHistory([...history, currentFileName]);
             } catch {
-                await tryLoadImage();
+                setTimeout(() => {
+                    tryLoadImage();
+                }, 1000);
             }
         };
 

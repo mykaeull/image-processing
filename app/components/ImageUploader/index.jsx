@@ -29,8 +29,9 @@ const ImageUploader = () => {
                 image.src = e.target.result;
 
                 image.onload = () => {
-                    canvas.width = image.width;
+                    canvas.width  = image.width;
                     canvas.height = image.height;
+                    console.log(image.width, image.height);
                     ctx.drawImage(image, 0, 0);
 
                     setHistory([file.name]);
@@ -79,8 +80,8 @@ const ImageUploader = () => {
                     ref={canvasRef}
                     style={{
                         display: imageSrc ? "block" : "none",
-                        width: "100%",
-                        height: "100%",
+                        // width: "100%",
+                        // height: "100%",
                         objectFit: "contain",
                     }}
                 />
