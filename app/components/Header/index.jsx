@@ -7,6 +7,7 @@ import useImageUploaderContext from "@/app/contexts/ImageUploaderContext";
 import LinearPorPartes from "@/app/components/LinearPorPartes";
 import SpectroFourier from "@/app/components/SpectroDeFourier";
 import ChromaKey from "@/app/components/ChromaKey";
+import EditKernel from "@/app/components/EditKernel";
 import generateHash from '@/app/utils/hash';
 
 const Header = () => {
@@ -14,6 +15,7 @@ const Header = () => {
     const [showModal, setShowModal] = useState(false);
     const [showModalSpectro, setShowModalSpectro] = useState(false);
     const [showModalChroma, setShowModalChroma] = useState(false);
+    const [showModalKernel, setShowModalKernel] = useState(false);
 
     const transformationsOptions = [
         {
@@ -148,6 +150,11 @@ const Header = () => {
                 showModal={showModal}
                 mainCanvas={canvasRef}
             />
+            <EditKernel
+                setShowModal={setShowModalKernel}
+                showModal={showModalKernel}
+                mainCanvas={canvasRef}
+            />
             <SpectroFourier
                 setShowModal={setShowModalSpectro}
                 showModal={showModalSpectro}
@@ -180,6 +187,13 @@ const Header = () => {
                     onClick={() => setShowModalChroma(!showModalChroma)}
                 >
                     Chroma Key
+                </button>
+                <button
+                    disabled={disabled}
+                    style={{ cursor: disabled ? "not-allowed" : "pointer" }}
+                    onClick={() => setShowModalKernel(!showModalKernel)}
+                >
+                    Kernel Editável
                 </button>
             </div>
 

@@ -6,6 +6,43 @@ import Modal from '@/app/components/Modal';
 import send from '@/app/utils/send';
 import generateHash from '@/app/utils/hash';
 
+const getDefaultValues = (odd) => {
+    const result = [];
+    for(let i = 0; i < odd; i++) {
+        for(let j = 0; j < odd; j++) {
+            result.push(i+j);
+        }
+    }
+
+    return result;
+}
+
+const generateDynamicInputs = (oddNumber, states, setStates) => {
+    let HTMLElements = [];
+    for(let i = 0; i < oddNumber; i++) {
+        let elements = [];
+        for(let j = 0; j < oddNumber; j++) {
+            elements.push(
+                <input style={{width: '50px'}} type="number" value={states[i*oddNumber+j]} onChange={
+                    () => {
+                        let newStates = [...states];
+                        newStates[i*oddNumber+j] = event.target.value;
+                        setStates(newStates);
+                    }
+                }></input>
+            )
+        }
+
+        HTMLElements.push(
+            <div style={{display: 'flex', gap: '5px'}}>
+                {...elements}
+            </div>
+        );
+    }
+
+    return HTMLElements;
+}
+
 const loadImage = (src) => {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -16,7 +53,7 @@ const loadImage = (src) => {
     });
 };
 
-const ChromaKey = ({
+const EditKernel = ({
     setShowModal,
     showModal,
     ...props
@@ -25,18 +62,19 @@ const ChromaKey = ({
         canvasRef, imageSrc, history, setHistory, setFileName, fileName
     } = useImageUploaderContext();
 
-    const [backFileName, setBackFileName] = useState("");
-    const [distance, setDistance] = useState(50);
-
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        console.log(file);
-        setBackFileName(file.name);
-    }
+    const [kernelSize, setKernelSize] = useState(3);
+    const [states, setStates]         = useState([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 
     const apply = () => {
         const outName = generateHash(8);
-        let command = `python filters.py 8 ${fileName} ${backFileName} ${distance} ${outName}`;
+        let command = `python filters.py 23 ${fileName} ${kernelSize} `;
+
+        for(let i = 0; i < states.length; i++) {
+            command += `${states[i]} `;
+        }
+
+        command += outName;
+
         send(command);
 
         const currentFileNamePath = `http://localhost:4000/${outName}`;
@@ -76,27 +114,30 @@ const ChromaKey = ({
     return (
         <Modal.Root showModal={showModal} style={{minWidth: '300px', height: 'fit-content'}}>
             <Modal.Header>
-                <p> Chroma Key </p>
+                <p> Convolução Genérica </p>
             </Modal.Header>
             <Modal.Content style={{display: 'flex', justifyContent: 'center', flexDirection: 'column'}}>
-                <div>
-                    <p> Selecione a imagem de background </p>
-                    <input 
-                        style={{marginTop: '10px'}}
-                        type="file" 
-                        accept="image/jpeg"
-                        onChange={handleFileChange}
+                <div style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+                    <p> Dimensão do Kernel </p>
+                    <input
+                        style={{marginTop: '10px', width: '50px'}}
+                        type="number"
+                        value={kernelSize}
+                        onChange={() => {
+                            if(event.target.value % 2 === 0) {
+                                alert('Apenas números impares são permitidos');
+                            } else if(event.target.value > 9) {
+                                alert('O tamanho máximo do Kernel deve ser 9');
+                            } else {
+                                setKernelSize(event.target.value);
+                                setStates(getDefaultValues(event.target.value));
+                            }
+                        }}
                     />
                 </div>
 
-                <div style={{marginTop: '30px'}}>
-                    <p> Distância </p>
-                    <input 
-                        style={{marginTop: '10px'}} 
-                        type="number" 
-                        value={distance}
-                        onChange={(e) => setDistance(e.target.value)}
-                    />
+                <div style={{marginTop: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    {generateDynamicInputs(kernelSize, states, setStates)}
                 </div>
             </Modal.Content>
             <Modal.Footer 
@@ -119,4 +160,4 @@ const ChromaKey = ({
     )
 }
 
-export default ChromaKey;
+export default EditKernel;
