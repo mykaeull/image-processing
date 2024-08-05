@@ -9,5 +9,8 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
+        height: 600px;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 }
