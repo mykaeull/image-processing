@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import useImageUploaderContext from "@/app/contexts/ImageUploaderContext";
-import Modal from '@/app/components/Modal';
-import send from '@/app/utils/send';
-import generateHash from '@/app/utils/hash';
+import Modal from "@/app/components/Modal";
+import send from "@/app/utils/send";
+import generateHash from "@/app/utils/hash";
 
 const loadImage = (src) => {
     return new Promise((resolve, reject) => {
@@ -17,13 +17,13 @@ const loadImage = (src) => {
 };
 
 function getPoints(points, canvas) {
-    const curPoints = points.map(p => [p[0], canvas.height-p[1]])
+    const curPoints = points.map((p) => [p[0], canvas.height - p[1]]);
 
     let factorX = 254 / canvas.width;
     let factorY = 254 / canvas.height;
 
-    return curPoints.map(p => {
-        return [Math.round(p[0]*factorX), Math.round(p[1]*factorY)];
+    return curPoints.map((p) => {
+        return [Math.round(p[0] * factorX), Math.round(p[1] * factorY)];
     });
 }
 
@@ -31,9 +31,9 @@ function apply(points, canvas, fileName) {
     points = getPoints(points, canvas);
 
     let command = `python filters.py 26 ${fileName} ${points.length} `;
-    
-    for(let e of points) {
-        command = command + e + ' ';
+
+    for (let e of points) {
+        command = command + e + " ";
     }
 
     const outName = generateHash(8);
@@ -44,34 +44,32 @@ function apply(points, canvas, fileName) {
     return outName;
 }
 
-const LinearPorPartes = ({
-    setShowModal,
-    showModal,
-    ...props
-}) => {
-    const { 
-        canvasRef, imageSrc, history, setHistory, setFileName, fileName 
-    } = useImageUploaderContext();
+const LinearPorPartes = ({ setShowModal, showModal, ...props }) => {
+    const { canvasRef, imageSrc, history, setHistory, setFileName, fileName } =
+        useImageUploaderContext();
 
     const localCanvas = useRef(null);
-    const [points, setPoints] = useState([[0, 399, 0], [399, 0, 1]]);
+    const [points, setPoints] = useState([
+        [0, 399, 0],
+        [399, 0, 1],
+    ]);
 
     useEffect(() => {
-        if(!localCanvas.current) return;
+        if (!localCanvas.current) return;
         const canvas = localCanvas.current;
-        const ctx    = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
 
         // Definindo o tamanho do canvas
-        canvas.width  = 400;
+        canvas.width = 400;
         canvas.height = 400;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         ctx.beginPath();
-        
-        for(let i = 0; i < points.length-1; i++) {
-            let [x, y]       = [points[i][0],   points[i][1]];
-            let [endx, endy] = [points[i+1][0], points[i+1][1]];
+
+        for (let i = 0; i < points.length - 1; i++) {
+            let [x, y] = [points[i][0], points[i][1]];
+            let [endx, endy] = [points[i + 1][0], points[i + 1][1]];
             ctx.moveTo(x, y);
             ctx.lineTo(endx, endy);
             ctx.arc(endx, endy, 2, 0, 2 * Math.PI);
@@ -99,11 +97,13 @@ const LinearPorPartes = ({
 
         const currentFileNamePath = `http://localhost:4000/${outName}`;
 
+        setShowModal(false);
+
         const tryLoadImage = async () => {
             try {
                 const canvas = canvasRef.current;
-                const ctx    = canvas.getContext("2d");
-                const data   = await loadImage(currentFileNamePath);
+                const ctx = canvas.getContext("2d");
+                const data = await loadImage(currentFileNamePath);
                 ctx.drawImage(data, 0, 0);
                 const imageData = ctx.getImageData(
                     0,
@@ -121,10 +121,13 @@ const LinearPorPartes = ({
         };
 
         tryLoadImage();
-    }
+    };
 
     return (
-        <Modal.Root showModal={showModal} style={{minWidth: '400px', minHeight: '400px'}}>
+        <Modal.Root
+            showModal={showModal}
+            style={{ minWidth: "400px", minHeight: "400px" }}
+        >
             <Modal.Header>
                 <p> Linear Por partes </p>
             </Modal.Header>
@@ -139,37 +142,56 @@ const LinearPorPartes = ({
                     }}
                 />
             </Modal.Content>
-            <Modal.Footer 
+            <Modal.Footer
                 style={{
-                    display: 'flex',
-                    flexDirection: 'row-reverse',
+                    display: "flex",
+                    flexDirection: "row-reverse",
                 }}
             >
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'row-reverse',
-                    width: '100%',
-                    gap: '10px',
-                }}>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "row-reverse",
+                        width: "100%",
+                        gap: "10px",
+                    }}
+                >
                     <button onClick={applyFilter}>Apply</button>
-                    <button onClick={() => setShowModal(!showModal)}>Close</button>
+                    <button onClick={() => setShowModal(!showModal)}>
+                        Close
+                    </button>
                 </div>
-                <div style={{display: 'flex', gap: '10px'}}>
-                    <button onClick={() => setPoints([[0, 399, 0], [399, 0, 1]])}>Clear</button>
-                    <button onClick={() => {
-                        if (points.length <= 2) return;
-                        setPoints((prevPoints) => {
-                            const lastPointIndex = prevPoints.length-1;
-                            const newPoints = [...prevPoints.filter((point) => point[2] != lastPointIndex)];
-                            return newPoints;
-                        });
-                    }}> 
-                    Undo
+                <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                        onClick={() =>
+                            setPoints([
+                                [0, 399, 0],
+                                [399, 0, 1],
+                            ])
+                        }
+                    >
+                        Clear
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (points.length <= 2) return;
+                            setPoints((prevPoints) => {
+                                const lastPointIndex = prevPoints.length - 1;
+                                const newPoints = [
+                                    ...prevPoints.filter(
+                                        (point) => point[2] != lastPointIndex
+                                    ),
+                                ];
+                                return newPoints;
+                            });
+                        }}
+                    >
+                        Undo
                     </button>
                 </div>
             </Modal.Footer>
         </Modal.Root>
-    )
-}
+    );
+};
 
 export default LinearPorPartes;

@@ -28,7 +28,7 @@ const FunctionsSelect = ({ options }) => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
 
-        const codes_with_no_effect = ['20'];
+        const codes_with_no_effect = ["20"];
 
         let transformationStrFormatted = transformationStr;
 
@@ -41,7 +41,12 @@ const FunctionsSelect = ({ options }) => {
 
         send(transformationStrFormatted);
 
-        if(codes_with_no_effect.includes(transformationStrFormatted.split(' ')[2])) return;
+        if (
+            codes_with_no_effect.includes(
+                transformationStrFormatted.split(" ")[2]
+            )
+        )
+            return;
 
         const currentFileName = transformationStrFormatted
             .split(" ")
@@ -54,7 +59,7 @@ const FunctionsSelect = ({ options }) => {
         const tryLoadImage = async () => {
             try {
                 const data = await loadImage(currentFileNamePath);
-                canvas.width  = data.width;
+                canvas.width = data.width;
                 canvas.height = data.height;
                 ctx.drawImage(data, 0, 0);
                 const imageData = ctx.getImageData(
@@ -88,7 +93,7 @@ const FunctionsSelect = ({ options }) => {
                 disabled={disabled}
                 style={{ cursor: disabled ? "not-allowed" : "pointer" }}
             >
-                Transformations
+                Transformações
             </button>
             {showFilters && (
                 <div className="filter-options">

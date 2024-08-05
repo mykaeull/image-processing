@@ -41,6 +41,8 @@ const ChromaKey = ({ setShowModal, showModal, ...props }) => {
 
         setFileName(outName);
 
+        setShowModal(false);
+
         const tryLoadImage = async () => {
             try {
                 const canvas = canvasRef.current;
@@ -96,34 +98,42 @@ const ChromaKey = ({ setShowModal, showModal, ...props }) => {
                     />
                 </div>
 
-                <div style={{ marginTop: "30px" }}>
-                    <p> Red </p>
-                    <input
-                        style={{ marginTop: "10px" }}
-                        type="number"
-                        value={red}
-                        onChange={(e) => setRed(e.target.value)}
-                    />
-                    <p> Green </p>
-                    <input
-                        style={{ marginTop: "10px" }}
-                        type="number"
-                        value={green}
-                        onChange={(e) => setGreen(e.target.value)}
-                    />
-                    <p> Blue </p>
-                    <input
-                        style={{ marginTop: "10px" }}
-                        type="number"
-                        value={blue}
-                        onChange={(e) => setBlue(e.target.value)}
-                    />
+                <div
+                    style={{ marginTop: "30px", display: "flex", gap: "1rem" }}
+                >
+                    <div style={{ width: "3rem" }}>
+                        <p> Red </p>
+                        <input
+                            style={{ width: "100%" }}
+                            type="number"
+                            value={red}
+                            onChange={(e) => setRed(e.target.value)}
+                        />
+                    </div>
+                    <div style={{ width: "3rem" }}>
+                        <p> Green </p>
+                        <input
+                            style={{ width: "100%" }}
+                            type="number"
+                            value={green}
+                            onChange={(e) => setGreen(e.target.value)}
+                        />
+                    </div>
+                    <div style={{ width: "3rem" }}>
+                        <p> Blue </p>
+                        <input
+                            style={{ width: "100%" }}
+                            type="number"
+                            value={blue}
+                            onChange={(e) => setBlue(e.target.value)}
+                        />
+                    </div>
                 </div>
 
-                <div style={{ marginTop: "30px" }}>
+                <div style={{ marginTop: "30px", width: "5rem" }}>
                     <p> Distância </p>
                     <input
-                        style={{ marginTop: "10px" }}
+                        style={{ width: "100%" }}
                         type="number"
                         value={distance}
                         onChange={(e) => setDistance(e.target.value)}

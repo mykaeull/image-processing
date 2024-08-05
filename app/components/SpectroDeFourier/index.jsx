@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import useImageUploaderContext from "@/app/contexts/ImageUploaderContext";
-import Modal from '@/app/components/Modal';
-import send from '@/app/utils/send';
-import generateHash from '@/app/utils/hash';
+import Modal from "@/app/components/Modal";
+import send from "@/app/utils/send";
+import generateHash from "@/app/utils/hash";
 
 const distance2D = (p1, p2) => {
     return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2));
-}
+};
 
 const loadImage = (src) => {
     return new Promise((resolve, reject) => {
@@ -21,12 +21,12 @@ const loadImage = (src) => {
 };
 
 function getBlackCanvas(width, height) {
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    const ctx    = canvas.getContext('2d');
-    const data   = ctx.createImageData(width, height);
-    for(let i = 0; i < data.data.length; i += 4) {
+    const ctx = canvas.getContext("2d");
+    const data = ctx.createImageData(width, height);
+    for (let i = 0; i < data.data.length; i += 4) {
         data.data[i] = 0;
         data.data[i + 1] = 0;
         data.data[i + 2] = 0;
@@ -37,35 +37,30 @@ function getBlackCanvas(width, height) {
 }
 
 function getPixels(canvas) {
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     return imageData.data;
 }
 
 function loadSpectre(fileName) {
     const outName = generateHash(8);
-    let command = `python filters.py 24 ${fileName} ${outName}`
-    
+    let command = `python filters.py 24 ${fileName} ${outName}`;
+
     send(command);
     return outName;
 }
 
-const SpectroFourier = ({
-    setShowModal,
-    showModal,
-    ...props
-}) => {
+const SpectroFourier = ({ setShowModal, showModal, ...props }) => {
     const localCanvas = useRef(null);
-    const {
-        canvasRef, imageSrc, history, setHistory, setFileName, fileName
-    } = useImageUploaderContext();
+    const { canvasRef, imageSrc, history, setHistory, setFileName, fileName } =
+        useImageUploaderContext();
 
     const [points, setPoints] = useState([]);
     const [mouseDown, setMouseDown] = useState(false);
     const [image, setImage] = useState(null);
 
     useEffect(() => {
-        if(!showModal) return;
+        if (!showModal) return;
 
         const canvas = localCanvas.current;
         setImage(canvas);
@@ -79,11 +74,11 @@ const SpectroFourier = ({
         const tryLoadImage = async () => {
             try {
                 const canvas = localCanvas.current;
-                const ctx    = canvas.getContext("2d");
+                const ctx = canvas.getContext("2d");
 
-                const data   = await loadImage(currentFileNamePath);
+                const data = await loadImage(currentFileNamePath);
 
-                canvas.width  = data.width;
+                canvas.width = data.width;
                 canvas.height = data.height;
 
                 ctx.drawImage(data, 0, 0);
@@ -106,19 +101,19 @@ const SpectroFourier = ({
     }, [showModal]);
 
     const noMouseMoveHandler = (event) => {
-        if(!mouseDown) return;
+        if (!mouseDown) return;
         const canvas = localCanvas.current;
-        const ctx    = canvas.getContext('2d');
-        const rect   = canvas.getBoundingClientRect();
-        const x      = event.clientX - rect.left;
-        const y      = event.clientY - rect.top;
-        
+        const ctx = canvas.getContext("2d");
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
         let lastPoint = null;
-        if(points.length) {
+        if (points.length) {
             lastPoint = points.slice(-1)[0];
         }
 
-        if(lastPoint && distance2D([x, y], lastPoint) < 1) return;
+        if (lastPoint && distance2D([x, y], lastPoint) < 1) return;
 
         // ctx.save();
         ctx.moveTo(x, y);
@@ -131,7 +126,7 @@ const SpectroFourier = ({
             const newPoints = [...prevPoints, [x, y]];
             return newPoints;
         });
-    }
+    };
 
     const generateBlackCanvas = () => {
         const newCanvas = getBlackCanvas(
@@ -139,16 +134,16 @@ const SpectroFourier = ({
             localCanvas.current.height
         );
 
-        const ctx = newCanvas.getContext('2d');
-        
-        for(const point of points) {
+        const ctx = newCanvas.getContext("2d");
+
+        for (const point of points) {
             const [x, y] = point;
             ctx.moveTo(x, y);
             ctx.arc(x, y, 2, 0, 4 * Math.PI);
             ctx.fillStyle = "white";
             ctx.fill();
         }
-        
+
         const imageData = ctx.getImageData(
             0,
             0,
@@ -158,9 +153,9 @@ const SpectroFourier = ({
 
         const pxs = [];
 
-        for(let x = 0; x < newCanvas.width; x++) {
+        for (let x = 0; x < newCanvas.width; x++) {
             let row = [];
-            for(let y = 0; y < newCanvas.height; y++) {
+            for (let y = 0; y < newCanvas.height; y++) {
                 const i = (y * newCanvas.width + x) * 4;
                 const r = imageData.data[i];
                 row.push(r > 0 ? 0 : 1);
@@ -170,11 +165,11 @@ const SpectroFourier = ({
 
         const outName = generateHash(8);
 
-        send(
-            `python filters.py 25 ${fileName} ${outName}`, 
-            true, 
-            {pixels: pxs, width: newCanvas.width, height: newCanvas.height}
-        );
+        send(`python filters.py 25 ${fileName} ${outName}`, true, {
+            pixels: pxs,
+            width: newCanvas.width,
+            height: newCanvas.height,
+        });
 
         setFileName(outName);
 
@@ -183,11 +178,11 @@ const SpectroFourier = ({
         const tryLoadImage = async () => {
             try {
                 const canvas = canvasRef.current;
-                const ctx    = canvas.getContext("2d");
+                const ctx = canvas.getContext("2d");
 
-                const data   = await loadImage(currentFileNamePath);
+                const data = await loadImage(currentFileNamePath);
 
-                canvas.width  = data.width;
+                canvas.width = data.width;
                 canvas.height = data.height;
 
                 ctx.drawImage(data, 0, 0);
@@ -211,14 +206,19 @@ const SpectroFourier = ({
 
         //localCanvas.current.getContext("2d").putImageData(imageData, 0, 0);
         // localCanvas.current = newCanvas;
-    }
+    };
 
     return (
-        <Modal.Root showModal={showModal} style={{minWidth: '600px', minHeight: '300px'}}>
+        <Modal.Root
+            showModal={showModal}
+            style={{ minWidth: "600px", minHeight: "300px" }}
+        >
             <Modal.Header>
                 <p> Spectro de Fourier </p>
             </Modal.Header>
-            <Modal.Content style={{display: 'flex', justifyContent: 'center'}}>
+            <Modal.Content
+                style={{ display: "flex", justifyContent: "center" }}
+            >
                 <div>
                     <canvas
                         ref={localCanvas}
@@ -229,26 +229,35 @@ const SpectroFourier = ({
                     />
                 </div>
             </Modal.Content>
-            <Modal.Footer 
+            <Modal.Footer
                 style={{
-                    display: 'flex',
-                    flexDirection: 'row-reverse',
+                    display: "flex",
+                    flexDirection: "row-reverse",
                 }}
             >
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'row-reverse',
-                    width: '100%',
-                    gap: '10px',
-                }}>
-                    <button onClick={() => {
-                        generateBlackCanvas();
-                    }}>Apply</button>
-                    <button onClick={() => setShowModal(!showModal)}>Close</button>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "row-reverse",
+                        width: "100%",
+                        gap: "10px",
+                    }}
+                >
+                    <button
+                        onClick={() => {
+                            generateBlackCanvas();
+                            setShowModal(false);
+                        }}
+                    >
+                        Apply
+                    </button>
+                    <button onClick={() => setShowModal(!showModal)}>
+                        Close
+                    </button>
                 </div>
             </Modal.Footer>
         </Modal.Root>
-    )
-}
+    );
+};
 
 export default SpectroFourier;
